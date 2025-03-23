@@ -27,7 +27,7 @@ service = Service(executable_path=chromedriver_path, log_path='chromedriver.log'
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
 # 目标网页URL
-url = 'https://www.computer.org/csdl/proceedings-article/sc/2015/2807623/12OmNBf94Xq'
+url = 'https://leetcode.com/'
 
 max_retries = 3
 retries = 0
@@ -48,7 +48,52 @@ while retries < max_retries:
         else:
             print(f"超过最大重试次数 ({max_retries} 次)，无法加载页面。")
 
-# 用一个集合来保存所有不重复的host
+
+
+import os
+import re
+
+# 存储所有唯一的 hosts URL
+unique_hosts = set()
+def sanitize_url(url):
+    # 去掉 URL 中的协议部分（http:// 或 https://）
+    url = re.sub(r'^https?://', '', url)
+    
+    # 将下划线 _ 替换为空字符串
+    url = url.replace('_', '')
+    
+    # 替换 URL 中的特殊字符为合法的文件名字符
+    # 可以替换为其他字符，比如下划线，空格等
+    url = re.sub(r'[^\w\s.-]', '', url)
+    
+    # 将多个连续的点（.）替换为一个点
+    url = re.sub(r'\.{2,}', '.', url)
+    
+    return url
+
+# 获取目录中所有的文件
+folder_path = 'data'  # 替换为您文件夹的路径
+for filename in os.listdir(folder_path):
+    file_path = os.path.join(folder_path, filename)
+    
+    # 确保我们只处理 JS 文件
+    if os.path.isfile(file_path) and file_path.endswith('.js'):
+        # 读取文件内容
+        with open(file_path, 'r', encoding='utf-8') as file:
+            js_content = file.read()
+
+        # 使用正则表达式匹配 'const hosts = [...]' 数组内容
+        match = re.search(r'const\s+hosts\s*=\s*\[([^\]]*)\];', js_content)
+        
+        # 如果匹配成功
+        if match:
+            # 提取数组中的 URL
+            urls = re.findall(r'"([^"]+)"', match.group(1))
+            
+            # 将 URL 添加到集合中，自动去重
+            unique_hosts.update(urls)
+
+
 hosts = set()
 
 # 假设 driver 是一个已经初始化的浏览器驱动，并且抓取了所有请求
@@ -57,16 +102,22 @@ for request in driver.requests:
         # 解析请求的URL，提取host部分
         parsed_url = urlparse(request.url)
         if parsed_url.netloc:  # 如果URL中有有效的host部分
+            unique_hosts.add(parsed_url.netloc)
             hosts.add(parsed_url.netloc)
 
 # 将不同的host保存为JavaScript数组格式到.js文件
-with open('hosts.js', 'w', encoding='utf-8') as file:
+with open('data/' + sanitize_url(url) + '.js', 'w', encoding='utf-8') as file:
     file.write('const hosts = [\n')
     for host in hosts:
         file.write(f'    "{host}",\n')  # 将每个host作为字符串写入数组
     file.write('];\n')
 
 print("所有不同的host已成功保存到 hosts.js")
-
+# 将不同的host保存为JavaScript数组格式到.js文件
+with open('newest.js', 'w', encoding='utf-8') as file:
+    file.write('const hosts = [\n')
+    for host in unique_hosts:
+        file.write(f'    "{host}",\n')  # 将每个host作为字符串写入数组
+    file.write('];\n')
 # 关闭浏览器
 driver.quit()

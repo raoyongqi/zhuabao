@@ -21,6 +21,8 @@ firefox_options.binary_location = firefox_path
 geckodriver_path = 'geckodriver.exe'  # 这里设置 geckodriver 路径
 # 创建 Firefox 的服务对象，指定浏览器路径
 
+#https://leetcode.com/
+
 service = Service(executable_path=geckodriver_path, log_path='geckodriver.log')
 # 禁用代理
 import psutil
@@ -93,11 +95,7 @@ for request in driver.requests:
         parsed_url = urlparse(request.url)
         if parsed_url.netloc:  # 如果URL中有有效的host部分
             hosts.add(parsed_url.netloc)
-js_array = "const hosts = " + str(hosts).replace("'", '"') + ";"
 
-# 将结果保存到 .js 文件中
-with open('hosts.js', 'w', encoding='utf-8') as file:
-    file.write(js_array)
 # # # 将不同的host保存到txt文件
 with open('hosts.txt', 'w', encoding='utf-8') as file:
     for host in hosts:

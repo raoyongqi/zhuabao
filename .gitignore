@@ -1,6 +1,6 @@
 *.xlsx
 *.csv
-data/
+
 *.tif
 *.nc
 *.png
