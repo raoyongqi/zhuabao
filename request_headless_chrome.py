@@ -23,16 +23,14 @@ service = Service(executable_path=chromedriver_path, log_path='chromedriver.log'
 
 
 
-# 启动 Chrome 浏览器
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
 # 目标网页URL
-url = 'https://leetcode.com/'
+url = "https://apps.webofknowledge.com"
 
 max_retries = 3
 retries = 0
 
-# 尝试访问网页，直到成功或超过最大重试次数
 while retries < max_retries:
     try:
         driver.get(url)
@@ -87,7 +85,6 @@ for filename in os.listdir(folder_path):
         
         # 如果匹配成功
         if match:
-            # 提取数组中的 URL
             urls = re.findall(r'"([^"]+)"', match.group(1))
             
             # 将 URL 添加到集合中，自动去重
@@ -106,7 +103,7 @@ for request in driver.requests:
             hosts.add(parsed_url.netloc)
 
 # 将不同的host保存为JavaScript数组格式到.js文件
-with open('data/' + sanitize_url(url) + '.js', 'w', encoding='utf-8') as file:
+with open('single/' + sanitize_url(url) + '.js', 'w', encoding='utf-8') as file:
     file.write('const hosts = [\n')
     for host in hosts:
         file.write(f'    "{host}",\n')  # 将每个host作为字符串写入数组
@@ -114,10 +111,10 @@ with open('data/' + sanitize_url(url) + '.js', 'w', encoding='utf-8') as file:
 
 print("所有不同的host已成功保存到 hosts.js")
 # 将不同的host保存为JavaScript数组格式到.js文件
-with open('newest.js', 'w', encoding='utf-8') as file:
-    file.write('const hosts = [\n')
-    for host in unique_hosts:
-        file.write(f'    "{host}",\n')  # 将每个host作为字符串写入数组
-    file.write('];\n')
+# with open('newest.js', 'w', encoding='utf-8') as file:
+#     file.write('const hosts = [\n')
+#     for host in unique_hosts:
+#         file.write(f'    "{host}",\n')  # 将每个host作为字符串写入数组
+#     file.write('];\n')
 # 关闭浏览器
 driver.quit()
