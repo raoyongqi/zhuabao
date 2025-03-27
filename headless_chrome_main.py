@@ -24,7 +24,7 @@ def extract_and_sort_urls(js_content, variable_name):
     if match:
         urls = re.findall(r'"([^"]+)"', match.group(1))
         sorted_urls = sorted(urls, key=len)
-        filtered_urls = [url for url in sorted_urls if url not in ['ws', 'www']]
+        filtered_urls = [url for url in sorted_urls if url not in ['ws', 'www',"localhost","127.0.0.1"]]
         return filtered_urls
     return []
 
@@ -63,7 +63,10 @@ def sanitize_url(url):
     return url
 
 
-folder_path = 'data'  # 替换为您文件夹的路径
+folder_path = 'data'
+
+
+
 if not os.path.exists(folder_path):
     os.makedirs(folder_path)
     print(f"文件夹 '{folder_path}' 已创建。")
@@ -72,16 +75,15 @@ else:
     print(f"文件夹 '{folder_path}' 已存在。")
 total_files = len(begin_without_star_urls)
 
-# 定义计数器
 counter = 0
 
-# 创建错误日志文件
 error_log_path = 'error_log.txt'
 
 
 keep_urls = begin_without_star_urls
 
-keep_urls.append('ws')
+keep_urls.extend(['ws', 'localhost',"127.0.0.1"])
+
 
 def log_error(message):
 
